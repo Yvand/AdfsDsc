@@ -5,6 +5,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- AdfsDsc
+  - Fixed Sampler breaking change with GitHubTasks.
+- AdfsProperties
+  - Fixed issues with unavailable properties on Windows Server 2016
+  ([issue #51](https://github.com/X-Guardian/AdfsDsc/issues/51)).
+
+### Changed
+
+- AdfsDsc
+  - Updated gitversion configuration.
 - AdfsFarm
   - Added parameters `CertificateName`, `SigningCertificateName` and `DecryptionCertificateName`.
 
