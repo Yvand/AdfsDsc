@@ -360,7 +360,7 @@ function Set-TargetResource
     if (-not $PSBoundParameters.ContainsKey('CertificateThumbprint') -and
         -not $PSBoundParameters.ContainsKey('CertificateName'))
     {
-        $errorMessage = $script:localizedData.ResourceMissingCredentialErrorMessage
+        $errorMessage = $script:localizedData.ResourceMissingServiceCertificateErrorMessage
         New-InvalidArgumentException -Message $errorMessage -ArgumentName 'CertificateThumbprint'
     }
 
