@@ -109,6 +109,7 @@ function Get-TargetResource
         [System.Management.Automation.PSCredential]
         $Credential,
 
+        [Parameter()]
         [System.String]
         $CertificateName
     )
@@ -312,12 +313,15 @@ function Set-TargetResource
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $AdminConfiguration,
 
+        [Parameter()]
         [System.String]
         $CertificateName,
 
+        [Parameter()]
         [System.String]
         $SigningCertificateName,
 
+        [Parameter()]
         [System.String]
         $DecryptionCertificateName
     )
@@ -501,12 +505,15 @@ function Test-TargetResource
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $AdminConfiguration,
 
+        [Parameter()]
         [System.String]
         $CertificateName,
 
+        [Parameter()]
         [System.String]
         $SigningCertificateName,
 
+        [Parameter()]
         [System.String]
         $DecryptionCertificateName
     )
