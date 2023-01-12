@@ -344,7 +344,7 @@ function Set-TargetResource
     if (-not $PSBoundParameters.ContainsKey('ServiceAccountCredential') -and
         -not $PSBoundParameters.ContainsKey('GroupServiceAccountIdentifier'))
     {
-        $errorMessage = $script:localizedData.ResourceMissingCredentialErrorMessage
+        $errorMessage = $script:localizedData.ResourceMissingCredentialErrorMessage -f $FederationServiceName
         New-InvalidArgumentException -Message $errorMessage -ArgumentName 'ServiceAccountCredential'
     }
 
