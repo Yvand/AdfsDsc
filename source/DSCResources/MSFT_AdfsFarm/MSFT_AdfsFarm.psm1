@@ -168,6 +168,48 @@ function Get-TargetResource
             New-InvalidOperationException -Message $errorMessage
         }
 
+        # Token signing certificate
+        try
+        {
+            $adfsTokenSigningCertificate = Get-AdfsCertificate -CertificateType "Token-Signing" | Where-Object {$true -eq $_.IsPrimary}
+        }
+        catch
+        {
+            $errorMessage = $script:localizedData.GettingAdfsTokenSigningCertificateErrorMessage -f $FederationServiceName
+            New-InvalidOperationException -Message $errorMessage -ErrorRecord $_
+        }
+
+        if ($adfsTokenSigningCertificate -and $adfsTokenSigningCertificate.Certificate)
+        {
+            $SigningCertificateName  = $adfsTokenSigningCertificate.Certificate.Subject
+        }
+        else
+        {
+            $errorMessage = $script:localizedData.GettingAdfsTokenSigningCertificateErrorMessage -f $FederationServiceName
+            New-InvalidOperationException -Message $errorMessage
+        }
+
+        # Token decrypting certificate
+        try
+        {
+            $adfsTokenDecryptingCertificate = Get-AdfsCertificate -CertificateType "Token-Decrypting" | Where-Object {$true -eq $_.IsPrimary}
+        }
+        catch
+        {
+            $errorMessage = $script:localizedData.GettingAdfsTokenDecryptingCertificateErrorMessage -f $FederationServiceName
+            New-InvalidOperationException -Message $errorMessage -ErrorRecord $_
+        }
+
+        if ($adfsTokenDecryptingCertificate -and $adfsTokenDecryptingCertificate.Certificate)
+        {
+            $DecryptionCertificateName  = $adfsTokenDecryptingCertificate.Certificate.Subject
+        }
+        else
+        {
+            $errorMessage = $script:localizedData.GettingAdfsTokenDecryptingCertificateErrorMessage -f $FederationServiceName
+            New-InvalidOperationException -Message $errorMessage
+        }
+
         # Get ADFS service StartName (log on as) property
         $adfsService = Get-CimInstance -ClassName Win32_Service `
             -Filter "Name='$script:AdfsServiceName'" `
@@ -213,6 +255,8 @@ function Get-TargetResource
             FederationServiceName         = $adfsProperties.HostName
             CertificateThumbprint         = $certificateThumbprint
             CertificateName               = $certificateName
+            SigningCertificateName        = $SigningCertificateName
+            DecryptionCertificateName     = $DecryptionCertificateName
             FederationServiceDisplayName  = $adfsProperties.DisplayName
             GroupServiceAccountIdentifier = $groupServiceAccountIdentifier
             ServiceAccountCredential      = $serviceAccountCredential
@@ -229,6 +273,8 @@ function Get-TargetResource
             FederationServiceName         = $FederationServiceName
             CertificateThumbprint         = $CertificateThumbprint
             CertificateName               = $certificateName
+            SigningCertificateName        = $null
+            DecryptionCertificateName     = $null
             FederationServiceDisplayName  = $null
             GroupServiceAccountIdentifier = $null
             ServiceAccountCredential      = $null

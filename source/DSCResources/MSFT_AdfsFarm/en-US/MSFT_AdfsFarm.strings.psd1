@@ -15,6 +15,8 @@ ConvertFrom-StringData @'
     ResourceDuplicateServiceCertificateErrorMessage     = Only one of the service certificate parameters 'CertificateThumbprint' or 'CertificateName' should be specified. (FRMERR008)
     ResourceMissingServiceCertificateErrorMessage       = One of the service certificate parameters 'CertificateThumbprint' or 'CertificateName' must be specified. (FRMERR009)
     GettingAdfsSslCertificateErrorMessage       = Error getting the ADFS SSL Certificate for '{0}'. (FRMERR004)
+    GettingAdfsTokenSigningCertificateErrorMessage       = Error getting the ADFS token signing Certificate for '{0}'. (FRMERR004)
+    GettingAdfsTokenDecryptingCertificateErrorMessage       = Error getting the ADFS token decrypting Certificate for '{0}'. (FRMERR004)
     GettingAdfsServiceErrorMessage              = Error getting the ADFS service details for '{0}'. (FRMERR005)
     GettingAdfsSecurityTokenServiceErrorMessage = Error getting the ADFS Security Token Service details for '{0}'. (FRMERR006)
     GettingAdfsPropertiesErrorMessage           = Error getting the ADFS properties for '{0}'. (FRMERR007)
