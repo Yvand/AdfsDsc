@@ -440,21 +440,33 @@ function Set-TargetResource
 
         if ($PSBoundParameters.ContainsKey('CertificateName'))
         {
-            $siteCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $CertificateName
+            $siteCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $CertificateName | Sort-Object -Property NotAfter -Descending | Select-Object -First 1
+            if ($null -eq $siteCert) {
+                $errorMessage = $script:localizedData.ParameterCertificateNameInvalidErrorMessage
+                New-InvalidArgumentException -Message $errorMessage -ArgumentName 'CertificateName'
+            }
             $parameters.CertificateThumbprint = $siteCert.Thumbprint
             $parameters.Remove('CertificateName')
         }
 
         if ($PSBoundParameters.ContainsKey('SigningCertificateName'))
         {
-            $signingCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $SigningCertificateName
+            $signingCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $SigningCertificateName | Sort-Object -Property NotAfter -Descending | Select-Object -First 1
+            if ($null -eq $signingCert) {
+                $errorMessage = $script:localizedData.ParameterCertificateNameInvalidErrorMessage
+                New-InvalidArgumentException -Message $errorMessage -ArgumentName 'SigningCertificateName'
+            }
             $parameters.Add("SigningCertificateThumbprint", $signingCert.Thumbprint)
             $parameters.Remove('SigningCertificateName')
         }
 
         if ($PSBoundParameters.ContainsKey('DecryptionCertificateName'))
         {
-            $decryptionCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $DecryptionCertificateName
+            $decryptionCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $DecryptionCertificateName | Sort-Object -Property NotAfter -Descending | Select-Object -First 1
+            if ($null -eq $decryptionCert) {
+                $errorMessage = $script:localizedData.ParameterCertificateNameInvalidErrorMessage
+                New-InvalidArgumentException -Message $errorMessage -ArgumentName 'DecryptionCertificateName'
+            }
             $parameters.Add("DecryptionCertificateThumbprint", $decryptionCert.Thumbprint)
             $parameters.Remove('DecryptionCertificateName')
         }
