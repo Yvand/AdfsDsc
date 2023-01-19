@@ -412,9 +412,7 @@ function Set-TargetResource
 
     $GetTargetResourceParms = @{
         FederationServiceName = $FederationServiceName
-        CertificateThumbprint = $CertificateThumbprint
         Credential            = $Credential
-        CertificateName       = $CertificateName
     }
     $targetResource = Get-TargetResource @GetTargetResourceParms
 
