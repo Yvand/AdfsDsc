@@ -20,6 +20,7 @@ ConvertFrom-StringData @'
     GettingAdfsServiceErrorMessage              = Error getting the ADFS service details for '{0}'. (FRMERR005)
     GettingAdfsSecurityTokenServiceErrorMessage = Error getting the ADFS Security Token Service details for '{0}'. (FRMERR006)
     GettingAdfsPropertiesErrorMessage           = Error getting the ADFS properties for '{0}'. (FRMERR007)
+    ParameterCertificateNameInvalidErrorMessage = Could not find a certificate with Subject '{0}'. (FRMERR007)
 
     TargetResourcePresentDebugMessage         = '{0}' is Present. (FRMDBG001)
     TargetResourceAbsentDebugMessage          = '{0}' is Absent. (FRMDBG002)
