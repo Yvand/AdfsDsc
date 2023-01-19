@@ -578,9 +578,7 @@ function Test-TargetResource
 
     $getTargetResourceParms = @{
         FederationServiceName = $FederationServiceName
-        CertificateThumbprint = $CertificateThumbprint
         Credential            = $Credential
-        CertifcateDnsName       = $CertifcateDnsName
     }
     $targetResource = Get-TargetResource @getTargetResourceParms
 
