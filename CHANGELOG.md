@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated gitversion configuration.
   - Updated Azure Pipeline Ubuntu image version
 - AdfsFarm
-  - Added parameters `CertifcateDnsName`, `SigningCertifcateDnsName` and `DecryptionCertifcateDnsName`.
+  - Added parameters `CertificateDnsName`, `SigningCertificateDnsName` and `DecryptionCertificateDnsName`.
 
 ## [1.1.0] - 2020-12-22
 

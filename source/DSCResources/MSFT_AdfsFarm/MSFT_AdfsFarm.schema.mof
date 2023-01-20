@@ -11,7 +11,7 @@ class MSFT_AdfsFarm : OMI_BaseResource
     [Write, Description("Specifies the SQL Server database that will store the AD FS configuration settings. If not specified, the AD FS installer uses the Windows Internal Database to store configuration settings.")] String SQLConnectionString;
     [Write, EmbeddedInstance("MSFT_KeyValuePair"), Description("Specifies the Admin Configuration")] String AdminConfiguration[];
     [Read, Description("The state of the ADFS Farm.")] String Ensure;
-    [Write, Description("Specifies the name of the certificate to use for HTTPS bindings and service communication for ADFS. This value should match the thumbprint of a valid certificate in the Local Computer certificate store.")] String CertifcateDnsName;
-    [Write, Description("Specifies the name of the signing certificate for ADFS. This value should match the name of a valid certificate in the Local Computer certificate store.")] String SigningCertifcateDnsName;
-    [Write, Description("Specifies the name of the decryption certificate for ADFS. This value should match the name of a valid certificate in the Local Computer certificate store.")] String DecryptionCertifcateDnsName;
+    [Write, Description("Specifies the name of the certificate to use for HTTPS bindings and service communication for ADFS. This value should match the thumbprint of a valid certificate in the Local Computer certificate store.")] String CertificateDnsName;
+    [Write, Description("Specifies the name of the signing certificate for ADFS. This value should match the name of a valid certificate in the Local Computer certificate store.")] String SigningCertificateDnsName;
+    [Write, Description("Specifies the name of the decryption certificate for ADFS. This value should match the name of a valid certificate in the Local Computer certificate store.")] String DecryptionCertificateDnsName;
 };
