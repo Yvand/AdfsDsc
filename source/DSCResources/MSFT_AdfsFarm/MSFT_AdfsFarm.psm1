@@ -441,7 +441,8 @@ function Set-TargetResource
         if ($PSBoundParameters.ContainsKey('CertificateDnsName'))
         {
             $siteCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $CertificateDnsName | Sort-Object -Property NotAfter -Descending | Select-Object -First 1
-            if ($null -eq $siteCert) {
+            if ($null -eq $siteCert)
+            {
                 $errorMessage = $script:localizedData.ParameterCertificateDnsNameInvalidErrorMessage
                 New-InvalidArgumentException -Message $errorMessage -ArgumentName 'CertificateDnsName'
             }
@@ -452,7 +453,8 @@ function Set-TargetResource
         if ($PSBoundParameters.ContainsKey('SigningCertificateDnsName'))
         {
             $signingCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $SigningCertificateDnsName | Sort-Object -Property NotAfter -Descending | Select-Object -First 1
-            if ($null -eq $signingCert) {
+            if ($null -eq $signingCert)
+            {
                 $errorMessage = $script:localizedData.ParameterCertificateDnsNameInvalidErrorMessage
                 New-InvalidArgumentException -Message $errorMessage -ArgumentName 'SigningCertificateDnsName'
             }
@@ -463,7 +465,8 @@ function Set-TargetResource
         if ($PSBoundParameters.ContainsKey('DecryptionCertificateDnsName'))
         {
             $decryptionCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $DecryptionCertificateDnsName | Sort-Object -Property NotAfter -Descending | Select-Object -First 1
-            if ($null -eq $decryptionCert) {
+            if ($null -eq $decryptionCert)
+            {
                 $errorMessage = $script:localizedData.ParameterCertificateDnsNameInvalidErrorMessage
                 New-InvalidArgumentException -Message $errorMessage -ArgumentName 'DecryptionCertificateDnsName'
             }
