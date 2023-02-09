@@ -31,7 +31,7 @@
         service account.
 #>
 
-Configuration AdfsFarm_gMSA_WID_Config
+Configuration AdfsFarm_gMSA_Custom_Certs
 {
     Param
     (

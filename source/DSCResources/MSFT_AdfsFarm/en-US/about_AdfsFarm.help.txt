@@ -314,7 +314,7 @@ for the decryption certificate.
 The group Managed Service Account specified in the GroupServiceAccountIdentifier parameter will be used for the
 service account.
 
-Configuration AdfsFarm_gMSA_WID_Config
+Configuration AdfsFarm_gMSA_Custom_Certs
 {
     Param
     (
