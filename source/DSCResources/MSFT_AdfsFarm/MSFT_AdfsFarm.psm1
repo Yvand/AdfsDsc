@@ -85,6 +85,7 @@ function Get-TargetResource
         ----------------------------|----------------
         Get-AdfsSslCertificate      | Adfs
         Get-AdfsProperties          | Adfs
+        Get-AdfsCertificate         | Adfs
         Assert-Module               | AdfsDsc.Common
         Assert-DomainMember         | AdfsDsc.Common
         Get-AdfsConfigurationStatus | AdfsDsc.Common
@@ -101,17 +102,9 @@ function Get-TargetResource
         [System.String]
         $FederationServiceName,
 
-        [Parameter()]
-        [System.String]
-        $CertificateThumbprint,
-
         [Parameter(Mandatory = $true)]
         [System.Management.Automation.PSCredential]
-        $Credential,
-
-        [Parameter()]
-        [System.String]
-        $CertificateDnsName
+        $Credential
     )
 
     # Set Verbose and Debug parameters
@@ -171,7 +164,7 @@ function Get-TargetResource
         # Token signing certificate
         try
         {
-            $adfsTokenSigningCertificate = Get-AdfsCertificate -CertificateType "Token-Signing" | Where-Object {$true -eq $_.IsPrimary}
+            $adfsTokenSigningCertificate = Get-AdfsCertificate -CertificateType 'Token-Signing' | Where-Object { $_.IsPrimary -eq $true }
         }
         catch
         {
@@ -181,7 +174,7 @@ function Get-TargetResource
 
         if ($adfsTokenSigningCertificate -and $adfsTokenSigningCertificate.Certificate)
         {
-            $SigningCertificateDnsName  = $adfsTokenSigningCertificate.Certificate.Subject
+            $SigningCertificateDnsName = $adfsTokenSigningCertificate.Certificate.Subject
         }
         else
         {
@@ -192,7 +185,7 @@ function Get-TargetResource
         # Token decrypting certificate
         try
         {
-            $adfsTokenDecryptingCertificate = Get-AdfsCertificate -CertificateType "Token-Decrypting" | Where-Object {$true -eq $_.IsPrimary}
+            $adfsTokenDecryptingCertificate = Get-AdfsCertificate -CertificateType 'Token-Decrypting' | Where-Object { $_.IsPrimary -eq $true }
         }
         catch
         {
@@ -202,7 +195,7 @@ function Get-TargetResource
 
         if ($adfsTokenDecryptingCertificate -and $adfsTokenDecryptingCertificate.Certificate)
         {
-            $DecryptionCertificateDnsName  = $adfsTokenDecryptingCertificate.Certificate.Subject
+            $DecryptionCertificateDnsName = $adfsTokenDecryptingCertificate.Certificate.Subject
         }
         else
         {
@@ -254,9 +247,9 @@ function Get-TargetResource
         $returnValue = @{
             FederationServiceName         = $adfsProperties.HostName
             CertificateThumbprint         = $certificateThumbprint
-            CertificateDnsName               = $CertificateDnsName
-            SigningCertificateDnsName        = $SigningCertificateDnsName
-            DecryptionCertificateDnsName     = $DecryptionCertificateDnsName
+            CertificateDnsName            = $CertificateDnsName
+            SigningCertificateDnsName     = $SigningCertificateDnsName
+            DecryptionCertificateDnsName  = $DecryptionCertificateDnsName
             FederationServiceDisplayName  = $adfsProperties.DisplayName
             GroupServiceAccountIdentifier = $groupServiceAccountIdentifier
             ServiceAccountCredential      = $serviceAccountCredential
@@ -271,10 +264,10 @@ function Get-TargetResource
 
         $returnValue = @{
             FederationServiceName         = $FederationServiceName
-            CertificateThumbprint         = $CertificateThumbprint
-            CertificateDnsName               = $CertificateDnsName
-            SigningCertificateDnsName        = $null
-            DecryptionCertificateDnsName     = $null
+            CertificateThumbprint         = $null
+            CertificateDnsName            = $null
+            SigningCertificateDnsName     = $null
+            DecryptionCertificateDnsName  = $null
             FederationServiceDisplayName  = $null
             GroupServiceAccountIdentifier = $null
             ServiceAccountCredential      = $null
@@ -327,13 +320,17 @@ function Set-TargetResource
         [System.String]
         $FederationServiceName,
 
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.PSCredential]
+        $Credential,
+
         [Parameter()]
         [System.String]
         $CertificateThumbprint,
 
-        [Parameter(Mandatory = $true)]
-        [System.Management.Automation.PSCredential]
-        $Credential,
+        [Parameter()]
+        [System.String]
+        $CertificateDnsName,
 
         [Parameter()]
         [System.String]
@@ -358,10 +355,6 @@ function Set-TargetResource
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $AdminConfiguration,
-
-        [Parameter()]
-        [System.String]
-        $CertificateDnsName,
 
         [Parameter()]
         [System.String]
@@ -410,6 +403,14 @@ function Set-TargetResource
         New-InvalidArgumentException -Message $errorMessage -ArgumentName 'CertificateThumbprint'
     }
 
+    # Check that either both signing and decryption certificate DNS name parameters have been specified or neither
+    if ($PSBoundParameters.ContainsKey('SigningCertificateDnsName') -xor
+        $PSBoundParameters.ContainsKey('DecryptionCertificateDnsName'))
+    {
+        $errorMessage = $script:localizedData.ResourceInvalidSignDecryptCertificateErrorMessage
+        New-InvalidArgumentException -Message $errorMessage -ArgumentName 'SigningCertificateDnsName'
+    }
+
     $GetTargetResourceParms = @{
         FederationServiceName = $FederationServiceName
         Credential            = $Credential
@@ -426,7 +427,7 @@ function Set-TargetResource
         if ($PSBoundParameters.ContainsKey('AdminConfiguration'))
         {
             # Convert AdminConfiguration Parameter from CimInstance#MSFT_KeyValuePair to HashTable
-            $adminConfigurationHashTable=@{}
+            $adminConfigurationHashTable = @{}
 
             foreach ($KeyPair in $AdminConfiguration)
             {
@@ -438,24 +439,28 @@ function Set-TargetResource
             $parameters.AdminConfiguration = $adminConfigurationHashTable
         }
 
+        $localMachineCertPath = 'cert:\LocalMachine\My\'
+
         if ($PSBoundParameters.ContainsKey('CertificateDnsName'))
         {
-            $siteCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $CertificateDnsName | Sort-Object -Property NotAfter -Descending | Select-Object -First 1
-            if ($null -eq $siteCert)
+            $serviceCert = Get-ChildItem -Path $localMachineCertPath -DnsName $CertificateDnsName |
+                Sort-Object -Property NotAfter -Descending | Select-Object -First 1
+            if ($null -eq $serviceCert)
             {
-                $errorMessage = $script:localizedData.ParameterCertificateDnsNameInvalidErrorMessage
+                $errorMessage = $script:localizedData.CertificateNotFoundErrorMessage -f $CertificateDnsName
                 New-InvalidArgumentException -Message $errorMessage -ArgumentName 'CertificateDnsName'
             }
-            $parameters.CertificateThumbprint = $siteCert.Thumbprint
+            $parameters.CertificateThumbprint = $serviceCert.Thumbprint
             $parameters.Remove('CertificateDnsName')
         }
 
         if ($PSBoundParameters.ContainsKey('SigningCertificateDnsName'))
         {
-            $signingCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $SigningCertificateDnsName | Sort-Object -Property NotAfter -Descending | Select-Object -First 1
+            $signingCert = Get-ChildItem -Path $localMachineCertPath -DnsName $SigningCertificateDnsName |
+                Sort-Object -Property NotAfter -Descending | Select-Object -First 1
             if ($null -eq $signingCert)
             {
-                $errorMessage = $script:localizedData.ParameterCertificateDnsNameInvalidErrorMessage
+                $errorMessage = $script:localizedData.CertificateNotFoundErrorMessage -f $SigningCertificateDnsName
                 New-InvalidArgumentException -Message $errorMessage -ArgumentName 'SigningCertificateDnsName'
             }
             $parameters.Add("SigningCertificateThumbprint", $signingCert.Thumbprint)
@@ -464,10 +469,11 @@ function Set-TargetResource
 
         if ($PSBoundParameters.ContainsKey('DecryptionCertificateDnsName'))
         {
-            $decryptionCert = Get-ChildItem -Path "cert:\LocalMachine\My\" -DnsName $DecryptionCertificateDnsName | Sort-Object -Property NotAfter -Descending | Select-Object -First 1
+            $decryptionCert = Get-ChildItem -Path $localMachineCertPath -DnsName $DecryptionCertificateDnsName |
+                Sort-Object -Property NotAfter -Descending | Select-Object -First 1
             if ($null -eq $decryptionCert)
             {
-                $errorMessage = $script:localizedData.ParameterCertificateDnsNameInvalidErrorMessage
+                $errorMessage = $script:localizedData.CertificateNotFoundErrorMessage -f $DecryptionCertificateDnsName
                 New-InvalidArgumentException -Message $errorMessage -ArgumentName 'DecryptionCertificateDnsName'
             }
             $parameters.Add("DecryptionCertificateThumbprint", $decryptionCert.Thumbprint)
@@ -532,13 +538,13 @@ function Test-TargetResource
         [System.String]
         $FederationServiceName,
 
-        [Parameter()]
-        [System.String]
-        $CertificateThumbprint,
-
         [Parameter(Mandatory = $true)]
         [System.Management.Automation.PSCredential]
         $Credential,
+
+        [Parameter()]
+        [System.String]
+        $CertificateThumbprint,
 
         [Parameter()]
         [System.String]
